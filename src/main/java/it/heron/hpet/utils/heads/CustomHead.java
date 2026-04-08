@@ -56,15 +56,34 @@ public class CustomHead extends HeadFromString {
      * @throws MalformedURLException if the URL is malformed or the data is in an unexpected format
      */
     private URL getUrlFromBase64(String base64) throws MalformedURLException {
-        String decoded = new String(Base64.getDecoder().decode(base64));
-        // The expected fixed parts of the decoded JSON
-        String prefix = "{\"textures\":{\"SKIN\":{\"url\":\"";
-        String suffix = "\"}}}";
-        if (!decoded.startsWith(prefix) || !decoded.endsWith(suffix)) {
-            throw new MalformedURLException("Invalid Base64 skin texture format");
+        try {
+            String decoded = new String(Base64.getDecoder().decode(base64));
+
+            // Find the URL value in the JSON string using a more flexible approach
+            // Look for "url":"..." pattern
+            int urlStart = decoded.indexOf("\"url\":\"");
+            if (urlStart == -1) {
+                throw new MalformedURLException("Invalid Base64 skin texture format: 'url' field not found");
+            }
+
+            // Move past the "url":" part to get to the actual URL
+            urlStart += 7; // length of "url":"
+
+            // Find the closing quote of the URL value
+            int urlEnd = decoded.indexOf("\"", urlStart);
+            if (urlEnd == -1) {
+                throw new MalformedURLException("Invalid Base64 skin texture format: URL value not properly terminated");
+            }
+
+            // Extract the URL string
+            String urlString = decoded.substring(urlStart, urlEnd);
+
+            // Handle any escaped characters if present
+            urlString = urlString.replace("\\", "");
+
+            return new URL(urlString);
+        } catch (IllegalArgumentException e) {
+            throw new MalformedURLException("Invalid Base64 encoding: " + e.getMessage());
         }
-        // Extract the URL portion from the decoded JSON
-        String urlString = decoded.substring(prefix.length(), decoded.length() - suffix.length());
-        return new URL(urlString);
     }
 }
