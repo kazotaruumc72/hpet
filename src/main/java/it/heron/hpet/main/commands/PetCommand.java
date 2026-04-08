@@ -122,9 +122,9 @@ public final class PetCommand {
      * /hpet - main command, opens gui, pet.command
      */
     @FCommand(
-        name = "hpet", 
-        permission = "pet.command", 
-        description = "Main HPET command.", 
+        pattern = "/hpet",
+        permission = "pet.command",
+        description = "Main HPET command.",
         usageMessage = "/hpet [subcommand]"
     )
     public void onHpetCommand(CommandSender sender) {
@@ -132,8 +132,8 @@ public final class PetCommand {
     }
 
     @FCommand(
-        name = "hpet help", 
-        permission = "pet.command", 
+        pattern = "/hpet help",
+        permission = "pet.command",
         description = "Shows help for HPET commands"
     )
     public void onHelpCommand(CommandSender sender) {
